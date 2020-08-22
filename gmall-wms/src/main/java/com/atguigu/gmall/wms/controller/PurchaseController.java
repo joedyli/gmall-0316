@@ -1,8 +1,7 @@
-package com.atguigu.gmall.pms.controller;
+package com.atguigu.gmall.wms.controller;
 
 import java.util.List;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,40 +13,34 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.atguigu.gmall.pms.entity.SkuEntity;
-import com.atguigu.gmall.pms.service.SkuService;
+import com.atguigu.gmall.wms.entity.PurchaseEntity;
+import com.atguigu.gmall.wms.service.PurchaseService;
 import com.atguigu.gmall.common.bean.PageResultVo;
 import com.atguigu.gmall.common.bean.ResponseVo;
 import com.atguigu.gmall.common.bean.PageParamVo;
 
 /**
- * sku信息
+ * 采购信息
  *
  * @author fengge
  * @email fengge@atguigu.com
- * @date 2020-08-21 11:11:31
+ * @date 2020-08-22 15:47:12
  */
-@Api(tags = "sku信息 管理")
+@Api(tags = "采购信息 管理")
 @RestController
-@RequestMapping("pms/sku")
-public class SkuController {
+@RequestMapping("wms/purchase")
+public class PurchaseController {
 
     @Autowired
-    private SkuService skuService;
-
-    @GetMapping("spu/{spuId}")
-    public ResponseVo<List<SkuEntity>> querySkusBySpuId(@PathVariable("spuId")Long spuId){
-        List<SkuEntity> skuEntities = this.skuService.list(new QueryWrapper<SkuEntity>().eq("spu_id", spuId));
-        return ResponseVo.ok(skuEntities);
-    }
+    private PurchaseService purchaseService;
 
     /**
      * 列表
      */
     @GetMapping
     @ApiOperation("分页查询")
-    public ResponseVo<PageResultVo> querySkuByPage(PageParamVo paramVo){
-        PageResultVo pageResultVo = skuService.queryPage(paramVo);
+    public ResponseVo<PageResultVo> queryPurchaseByPage(PageParamVo paramVo){
+        PageResultVo pageResultVo = purchaseService.queryPage(paramVo);
 
         return ResponseVo.ok(pageResultVo);
     }
@@ -58,10 +51,10 @@ public class SkuController {
      */
     @GetMapping("{id}")
     @ApiOperation("详情查询")
-    public ResponseVo<SkuEntity> querySkuById(@PathVariable("id") Long id){
-		SkuEntity sku = skuService.getById(id);
+    public ResponseVo<PurchaseEntity> queryPurchaseById(@PathVariable("id") Long id){
+		PurchaseEntity purchase = purchaseService.getById(id);
 
-        return ResponseVo.ok(sku);
+        return ResponseVo.ok(purchase);
     }
 
     /**
@@ -69,8 +62,8 @@ public class SkuController {
      */
     @PostMapping
     @ApiOperation("保存")
-    public ResponseVo<Object> save(@RequestBody SkuEntity sku){
-		skuService.save(sku);
+    public ResponseVo<Object> save(@RequestBody PurchaseEntity purchase){
+		purchaseService.save(purchase);
 
         return ResponseVo.ok();
     }
@@ -80,8 +73,8 @@ public class SkuController {
      */
     @PostMapping("/update")
     @ApiOperation("修改")
-    public ResponseVo update(@RequestBody SkuEntity sku){
-		skuService.updateById(sku);
+    public ResponseVo update(@RequestBody PurchaseEntity purchase){
+		purchaseService.updateById(purchase);
 
         return ResponseVo.ok();
     }
@@ -92,7 +85,7 @@ public class SkuController {
     @PostMapping("/delete")
     @ApiOperation("删除")
     public ResponseVo delete(@RequestBody List<Long> ids){
-		skuService.removeByIds(ids);
+		purchaseService.removeByIds(ids);
 
         return ResponseVo.ok();
     }
