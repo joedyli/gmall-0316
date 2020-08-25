@@ -5,6 +5,7 @@ import com.atguigu.gmall.sms.entity.SkuLadderEntity;
 import com.atguigu.gmall.sms.mapper.SkuFullReductionMapper;
 import com.atguigu.gmall.sms.mapper.SkuLadderMapper;
 import com.atguigu.gmall.sms.vo.SkuSaleVo;
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import com.atguigu.gmall.common.bean.PageParamVo;
 import com.atguigu.gmall.sms.mapper.SkuBoundsMapper;
 import com.atguigu.gmall.sms.entity.SkuBoundsEntity;
 import com.atguigu.gmall.sms.service.SkuBoundsService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 
@@ -41,6 +43,7 @@ public class SkuBoundsServiceImpl extends ServiceImpl<SkuBoundsMapper, SkuBounds
         return new PageResultVo(page);
     }
 
+    @Transactional
     @Override
     public void saveSkuSales(SkuSaleVo skuSaleVo) {
         // 3.1. 保存sms_sku_bounds

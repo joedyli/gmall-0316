@@ -7,6 +7,7 @@ import com.atguigu.gmall.common.bean.PageParamVo;
 import com.atguigu.gmall.pms.entity.SpuEntity;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileNotFoundException;
 import java.util.Map;
 
 /**
@@ -22,7 +23,7 @@ public interface SpuService extends IService<SpuEntity> {
 
     PageResultVo querySpuByCidPage(Long cid, PageParamVo pageParamVo);
 
-    void bigSave(SpuVo spu);
+    void bigSave(SpuVo spu) throws FileNotFoundException;
 
 
 }
