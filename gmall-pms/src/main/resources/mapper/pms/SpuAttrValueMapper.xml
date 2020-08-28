@@ -2,4 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.atguigu.gmall.pms.mapper.SpuAttrValueMapper">
 
+    <select id="querySearchAttrValuesBySpuId" resultType="com.atguigu.gmall.pms.entity.SpuAttrValueEntity">
+        select b.* from pms_attr a INNER JOIN pms_spu_attr_value b on a.id=b.attr_id where a.search_type=1 and b.spu_id=#{spuId}
+    </select>
 </mapper>
