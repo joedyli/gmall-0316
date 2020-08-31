@@ -264,8 +264,8 @@ public class SearchService {
             sort = 0;
         }
         switch (sort) {
-            case 1: sourceBuilder.sort("price", SortOrder.ASC); break;
-            case 2: sourceBuilder.sort("price", SortOrder.DESC); break;
+            case 1: sourceBuilder.sort("price", SortOrder.DESC); break;
+            case 2: sourceBuilder.sort("price", SortOrder.ASC); break;
             case 3: sourceBuilder.sort("createTime", SortOrder.DESC); break;
             case 4: sourceBuilder.sort("sales", SortOrder.DESC); break;
             default:
