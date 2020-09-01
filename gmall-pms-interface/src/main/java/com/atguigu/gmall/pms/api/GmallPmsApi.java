@@ -31,4 +31,10 @@ public interface GmallPmsApi {
 
     @GetMapping("pms/spuattrvalue/spu/{spuId}")
     public ResponseVo<List<SpuAttrValueEntity>> querySearchAttrValuesBySpuId(@PathVariable("spuId")Long spuId);
+
+    @GetMapping("pms/spu/{id}")
+    public ResponseVo<SpuEntity> querySpuById(@PathVariable("id") Long id);
+
+    @GetMapping("pms/category/parent/{parentId}")
+    public ResponseVo<List<CategoryEntity>> queryCategoriesByPid(@PathVariable("parentId")Long pid);
 }
