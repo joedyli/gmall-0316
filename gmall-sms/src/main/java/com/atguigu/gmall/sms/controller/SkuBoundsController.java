@@ -3,6 +3,7 @@ package com.atguigu.gmall.sms.controller;
 import java.util.List;
 
 import com.atguigu.gmall.sms.api.GmallSmsApi;
+import com.atguigu.gmall.sms.vo.ItemSaleVo;
 import com.atguigu.gmall.sms.vo.SkuSaleVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,12 @@ public class SkuBoundsController {
 
     @Autowired
     private SkuBoundsService skuBoundsService;
+
+    @GetMapping("sku/{skuId}")
+    public ResponseVo<List<ItemSaleVo>> querySaleVoBySkuId(@PathVariable("skuId")Long skuId){
+        List<ItemSaleVo> itemSaleVos = this.skuBoundsService.querySaleVoBySkuId(skuId);
+        return ResponseVo.ok(itemSaleVos);
+    }
 
     @PostMapping("sales/save")
     public ResponseVo<Object> saveSkuSales(@RequestBody SkuSaleVo skuSaleVo){
