@@ -3,6 +3,7 @@ package com.atguigu.gmall.pms.controller;
 import java.util.List;
 
 import com.atguigu.gmall.pms.vo.SaleAttrValueVo;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sun.org.apache.regexp.internal.RE;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,6 +47,12 @@ public class SkuAttrValueController {
     public ResponseVo<List<SaleAttrValueVo>> querySaleAttrValueVoBySpuId(@PathVariable("spuId")Long spuId){
         List<SaleAttrValueVo> saleAttrValueVos = this.skuAttrValueService.querySaleAttrValueVoBySpuId(spuId);
         return ResponseVo.ok(saleAttrValueVos);
+    }
+
+    @GetMapping("sku/sale/{skuId}")
+    public ResponseVo<List<SkuAttrValueEntity>> querySaleAttrValuesBySkuId(@PathVariable("skuId")Long skuId){
+        List<SkuAttrValueEntity> skuAttrValueEntities = this.skuAttrValueService.list(new QueryWrapper<SkuAttrValueEntity>().eq("sku_id", skuId));
+        return ResponseVo.ok(skuAttrValueEntities);
     }
 
     @GetMapping("sku/{skuId}")
