@@ -36,6 +36,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("query")
+    public ResponseVo<UserEntity> queryUser(
+            @RequestParam("loginName")String loginName,
+            @RequestParam("password")String password
+    ){
+        UserEntity userEntity = this.userService.queryUser(loginName, password);
+        return ResponseVo.ok(userEntity);
+    }
+
     @GetMapping("check/{data}/{type}")
     public ResponseVo<Boolean> checkData(@PathVariable("data")String data, @PathVariable("type")Integer type){
         Boolean flag = this.userService.chechData(data, type);

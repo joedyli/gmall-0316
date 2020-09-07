@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -17,6 +18,7 @@ import com.atguigu.gmall.common.bean.PageParamVo;
 import com.atguigu.gmall.ums.mapper.UserMapper;
 import com.atguigu.gmall.ums.entity.UserEntity;
 import com.atguigu.gmall.ums.service.UserService;
+import org.springframework.util.CollectionUtils;
 
 
 @Service("userService")
@@ -66,6 +68,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         this.save(userEntity);
 
         // 5.删除redis中的验证码 TODO：
+    }
+
+    @Override
+    public UserEntity queryUser(String loginName, String password) {
+
+        // 1.先根据登录名查询用户
+        List<UserEntity> userEntities = this.list(new QueryWrapper<UserEntity>()
+                .eq("username", loginName)
+                .or()
+                .eq("email", loginName)
+                .or()
+                .eq("phone", loginName));
+
+        // 2.判断用户信息是否为空
+        if (CollectionUtils.isEmpty(userEntities)){
+            return null;
+        }
+
+        String pwd = null;
+        for (UserEntity userEntity : userEntities) {
+            // 3.获取该用户的盐，对用户输入的明文密码加盐加密
+            pwd = DigestUtils.md5Hex(password + userEntity.getSalt());
+
+            // 4.用数据库中的密码和加密后的密码比较
+            if (StringUtils.equals(pwd, userEntity.getPassword())) {
+                return userEntity;
+            }
+        }
+
+        return null;
     }
 
 }

@@ -43,3 +43,10 @@ spring:
           uri: lb://item-service
           predicates:
             - Host=item.gmall.com
+        - id: auth-route
+          uri: lb://auth-service
+          predicates:
+            - Host=auth.gmall.com,sso.gmall.com
+          filters:
+            - AddResponseHeader=xxxxx, yyyyy
+            - Auth
