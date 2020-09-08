@@ -9,6 +9,10 @@ import java.net.UnknownHostException;
 
 /**
  * 获取ip地址
+ *
+ * 需要在nginx中配置：（否则，获取的是nginx服务器的ip地址）
+ *      proxy_set_header X-real-ip $remote_addr;
+ *      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
  */
 public class IpUtil {
 
