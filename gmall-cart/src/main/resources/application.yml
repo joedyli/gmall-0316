@@ -26,6 +26,28 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.jdbc.Driver
+  task:
+    execution:
+      thread-name-prefix: cart-async-
+      pool:
+        core-size: 100
+        max-size: 200
+        queue-capacity: 5000
+        keep-alive: 60s
+        allow-core-thread-timeout: true
+      shutdown:
+        await-termination: true
+        await-termination-period: 100
+  rabbitmq:
+    host: 172.16.116.100
+    virtual-host: /fengge
+    username: fengge
+    password: fengge
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1
+        concurrency: 3
 feign:
   sentinel:
     enabled: true
