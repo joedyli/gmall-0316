@@ -4,34 +4,26 @@ import com.atguigu.gmall.cart.feign.GmallPmsClient;
 import com.atguigu.gmall.cart.feign.GmallSmsClient;
 import com.atguigu.gmall.cart.feign.GmallWmsClient;
 import com.atguigu.gmall.cart.interceptor.LoginInterceptor;
-import com.atguigu.gmall.cart.mapper.CartMapper;
 import com.atguigu.gmall.cart.pojo.Cart;
-import com.atguigu.gmall.cart.pojo.UserInfo;
+import com.atguigu.gmall.common.bean.UserInfo;
 import com.atguigu.gmall.common.bean.ResponseVo;
 import com.atguigu.gmall.common.exception.CartException;
 import com.atguigu.gmall.pms.entity.SkuAttrValueEntity;
 import com.atguigu.gmall.pms.entity.SkuEntity;
 import com.atguigu.gmall.sms.vo.ItemSaleVo;
 import com.atguigu.gmall.wms.entity.WareSkuEntity;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -79,7 +71,7 @@ public class CartService {
                 cart.setCount(cart.getCount().add(count));
                 // 写回数据库
                 //this.cartMapper.update(cart, new UpdateWrapper<Cart>().eq("user_id", userId).eq("sku_id", skuIdString));
-                this.asyncService.updateByUserIdAndSkuId(cart, userId, skuIdString);
+                this.asyncService.updateByUserIdAndSkuId(userId, cart, skuIdString);
                 //hashOps.put(skuIdString, MAPPER.writeValueAsString(cart));
             } else {
                 // 无，则新增新的记录
@@ -113,7 +105,7 @@ public class CartService {
 
                 cart.setCheck(true);
 
-                this.asyncService.addCart(cart);
+                this.asyncService.addCart(userId, cart);
                 this.redisTemplate.opsForValue().set(PRICE_PREFIX + skuIdString, skuEntity.getPrice().toString());
             }
             hashOps.put(skuIdString, MAPPER.writeValueAsString(cart));
@@ -211,10 +203,10 @@ public class CartService {
                         BigDecimal count = cart.getCount();
                         cart = MAPPER.readValue(cartJson, Cart.class);
                         cart.setCount(cart.getCount().add(count));
-                        this.asyncService.updateByUserIdAndSkuId(cart, userId.toString(), cart.getSkuId().toString());
+                        this.asyncService.updateByUserIdAndSkuId(userId.toString(), cart, cart.getSkuId().toString());
                     } else {
                         cart.setUserId(userId.toString());
-                        this.asyncService.addCart(cart);
+                        this.asyncService.addCart(userId.toString(), cart);
                     }
                     loginHashOps.put(cart.getSkuId().toString(), MAPPER.writeValueAsString(cart));
                 } catch (JsonProcessingException e) {
@@ -260,7 +252,7 @@ public class CartService {
                 cart.setCount(count);
 
                 hashOps.put(cart.getSkuId().toString(), MAPPER.writeValueAsString(cart));
-                this.asyncService.updateByUserIdAndSkuId(cart, userId, cart.getSkuId().toString());
+                this.asyncService.updateByUserIdAndSkuId(userId, cart, cart.getSkuId().toString());
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
