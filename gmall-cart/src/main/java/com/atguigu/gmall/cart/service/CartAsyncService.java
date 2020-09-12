@@ -15,13 +15,13 @@ public class CartAsyncService {
 
     @Async
     public void updateByUserIdAndSkuId(String userId, Cart cart, String skuIdString){
-        int i = 1/0;
+        // int i = 1/0;
         this.cartMapper.update(cart, new UpdateWrapper<Cart>().eq("user_id", userId).eq("sku_id", skuIdString));
     }
 
     @Async
     public void addCart(String userId, Cart cart){
-        int i = 1/0;
+        // int i = 1/0;
         this.cartMapper.insert(cart);
     }
 

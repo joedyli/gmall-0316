@@ -30,6 +30,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         String userId = request.getHeader("userId");
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(Long.valueOf(userId));
+        THREAD_LOCAL.set(userInfo);
         return true;
     }
 

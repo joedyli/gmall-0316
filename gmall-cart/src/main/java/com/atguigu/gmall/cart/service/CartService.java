@@ -272,6 +272,25 @@ public class CartService {
         }
     }
 
+    public List<Cart> queryCheckedCartsByUserId(Long userId) {
+        // 获取该用户的所有购物车
+        BoundHashOperations<String, Object, Object> hashOps = this.redisTemplate.boundHashOps(KEY_PREFIX + userId);
+        List<Object> values = hashOps.values();
+        if (CollectionUtils.isEmpty(values)){
+            return null;
+        }
+
+        // 过滤出选中的购物车信息
+        return values.stream().map(json -> {
+            try {
+                return MAPPER.readValue(json.toString(), Cart.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).filter(Cart::getCheck).collect(Collectors.toList());
+    }
+
 //    @Async
 //    public ListenableFuture<String> executor1(){
 //        try {

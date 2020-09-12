@@ -1,5 +1,6 @@
 package com.atguigu.gmall.cart.listener;
 
+import com.alibaba.fastjson.JSON;
 import com.atguigu.gmall.cart.feign.GmallPmsClient;
 import com.atguigu.gmall.common.bean.ResponseVo;
 import com.atguigu.gmall.pms.entity.SkuEntity;
@@ -11,6 +12,7 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -18,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CartListener {
@@ -29,6 +32,8 @@ public class CartListener {
     private StringRedisTemplate redisTemplate;
 
     private static final String PRICE_PREFIX = "cart:price:";
+
+    private static final String KEY_PREFIX = "cart:info:";
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = "CART_ITEM_QUEUE", durable = "true"),
@@ -43,6 +48,25 @@ public class CartListener {
                 this.redisTemplate.opsForValue().setIfPresent(PRICE_PREFIX + skuEntity.getId().toString(), skuEntity.getPrice().toString());
             });
         }
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+    }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "CART_DELETE_QUEUE", durable = "true"),
+            exchange = @Exchange(value = "ORDER_EXCHANGE", ignoreDeclarationExceptions = "true", type = ExchangeTypes.TOPIC),
+            key = {"cart.delete"}
+    ))
+    public void delete(Map<String, Object> map, Channel channel, Message message) throws IOException {
+        if (CollectionUtils.isEmpty(map)){
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            return;
+        }
+        String userId = map.get("userId").toString();
+        String skuIdString = map.get("skuIds").toString();
+        List<String> skuIds = JSON.parseArray(skuIdString, String.class);
+
+        BoundHashOperations<String, Object, Object> hashOps = this.redisTemplate.boundHashOps(KEY_PREFIX + userId);
+        hashOps.delete(skuIds.toArray());
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
     }
 }
