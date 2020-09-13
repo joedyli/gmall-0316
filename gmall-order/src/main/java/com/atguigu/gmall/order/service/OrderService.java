@@ -127,7 +127,7 @@ public class OrderService {
         return confirmVo;
     }
 
-    public void submit(OrderSubmitVo submitVo) {
+    public OrderEntity submit(OrderSubmitVo submitVo) {
         //1.防重：判断是否重复提交  redis完成
         String orderToken = submitVo.getOrderToken();
         if (StringUtils.isEmpty(orderToken)){
@@ -177,13 +177,20 @@ public class OrderService {
             throw new OrderException(JSON.toJSONString(lockVos));
         }
 
+//        int i = 1/0;
+
         //4.创建订单并添加订单详情
         UserInfo userInfo = LoginInterceptor.getUserInfo();
         Long userId = userInfo.getUserId();
+        OrderEntity orderEntity = null;
         try {
-            this.omsClient.saveOrder(submitVo, userId);
+            ResponseVo<OrderEntity> orderEntityResponseVo = this.omsClient.saveOrder(submitVo, userId);
+            orderEntity = orderEntityResponseVo.getData();
+            this.rabbitTemplate.convertAndSend("ORDER_EXCHANGE", "order.ttl", orderToken);
         } catch (Exception e) {
             e.printStackTrace();
+            // 解锁库存
+            this.rabbitTemplate.convertAndSend("ORDER_EXCHANGE", "order.failure", orderToken);
             throw new OrderException("服务器错误！");
         }
 
@@ -193,5 +200,7 @@ public class OrderService {
         List<Long> skuIds = items.stream().map(OrderItemVo::getSkuId).collect(Collectors.toList());
         map.put("skuIds", JSON.toJSONString(skuIds));
         this.rabbitTemplate.convertAndSend("ORDER_EXCHANGE", "cart.delete", map);
+
+        return orderEntity;
     }
 }

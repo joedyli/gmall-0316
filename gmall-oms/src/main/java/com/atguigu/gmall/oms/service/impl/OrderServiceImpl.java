@@ -22,10 +22,12 @@ import com.atguigu.gmall.common.bean.PageParamVo;
 import com.atguigu.gmall.oms.mapper.OrderMapper;
 import com.atguigu.gmall.oms.entity.OrderEntity;
 import com.atguigu.gmall.oms.service.OrderService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Service("orderService")
@@ -50,6 +52,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
         return new PageResultVo(page);
     }
 
+    @Transactional
     @Override
     public OrderEntity saveOrder(OrderSubmitVo submitVo, Long userId) {
         // 1.新增订单
@@ -127,7 +130,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> impl
             this.itemMapper.insert(itemEntity);
         });
 
-
+//        try {
+//            TimeUnit.SECONDS.sleep(10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        int i = 1/0;
         return orderEntity;
     }
 

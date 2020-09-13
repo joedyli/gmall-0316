@@ -1,8 +1,10 @@
-package com.atguigu.gmall.order.config;
+package com.atguigu.gmall.wms.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,26 +35,13 @@ public class RabbitConfig {
 
     @Bean
     public Queue ttlQueue(){
-        return QueueBuilder
-                .durable("ORDER_TTL_QUEUE")
-                .withArgument("x-message-ttl", 90000)
+        return QueueBuilder.durable("STOCK_TTL_QUEUE").withArgument("x-message-ttl", 120000)
                 .withArgument("x-dead-letter-exchange", "ORDER_EXCHANGE")
-                .withArgument("x-dead-letter-routing-key", "order.dead")
-                .build();
+                .withArgument("x-dead-letter-routing-key", "stock.dead").build();
     }
 
     @Bean
     public Binding ttlBinding(){
-        return new Binding("ORDER_TTL_QUEUE", Binding.DestinationType.QUEUE, "ORDER_EXCHANGE", "order.ttl", null);
-    }
-
-    @Bean
-    public Queue deadQueue(){
-        return QueueBuilder.durable("ORDER_DEAD_QUEUE").build();
-    }
-
-    @Bean
-    public Binding deadBinding(){
-        return new Binding("ORDER_DEAD_QUEUE", Binding.DestinationType.QUEUE, "ORDER_EXCHANGE", "order.dead", null);
+        return new Binding("STOCK_TTL_QUEUE", Binding.DestinationType.QUEUE, "ORDER_EXCHANGE", "stock.ttl", null);
     }
 }
