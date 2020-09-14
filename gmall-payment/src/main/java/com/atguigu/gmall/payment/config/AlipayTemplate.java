@@ -62,4 +62,5 @@ public class AlipayTemplate {
         }
         return false;
     }
+
 }

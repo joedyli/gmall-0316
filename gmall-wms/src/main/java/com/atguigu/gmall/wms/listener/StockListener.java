@@ -55,4 +55,31 @@ public class StockListener {
         }
         channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
     }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(value = "STOCK_MINUS_QUEUE", durable = "true"),
+            exchange = @Exchange(value = "ORDER_EXCHANGE", ignoreDeclarationExceptions = "true", type = ExchangeTypes.TOPIC),
+            key = {"stock.minus"}
+    ))
+    public void minus(String orderToken, Channel channel, Message message) throws IOException {
+
+        // 判断orderToken是否为空
+        if (StringUtils.isBlank(orderToken)){
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            return;
+        }
+
+        // 以orderTOken为key查询锁定库存信息的缓存
+        String json = this.redisTemplate.opsForValue().get(KEY_PREFIX + orderToken);
+        // 锁定库存信息不为空，直接解锁库存
+        if (StringUtils.isNotBlank(json)){
+            List<SkuLockVo> skuLockVos = JSON.parseArray(json, SkuLockVo.class);
+            skuLockVos.forEach(skuLockVo -> {
+                this.wareSkuMapper.minus(skuLockVo.getWareSkuId(), skuLockVo.getCount());
+            });
+            // 防止重复解锁库存
+            this.redisTemplate.delete(KEY_PREFIX + orderToken);
+        }
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+    }
 }
